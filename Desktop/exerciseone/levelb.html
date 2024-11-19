@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港月度温度矩阵</title>
+    <link rel="stylesheet" href="levelb.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+</head>
+<body>
+    <h1>香港月度温度矩阵</h1>
+    <div class="controls">
+        <button id="toggleTemp">显示最大温度</button>
+    </div>
+    <!-- 容器包裹矩阵和数轴 -->
+    <div class="matrix-container">
+        <!-- 横轴：年份 -->
+        <div id="xAxis" class="x-axis"></div>
+
+        <!-- 纵轴：月份 -->
+        <div id="yAxis" class="y-axis"></div>
+
+
+        <!-- 温度矩阵 -->
+        <div id="matrix" class="matrix"></div>
+    </div>
+
+
+    <div id="legend" class="legend">
+        <p>温度与颜色的映射：</p>
+        <div class="color-legend" id="colorLegend"></div>
+    </div>
+
+    <script src="levelb.js"></script>
+</body>
+</html>
