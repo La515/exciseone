@@ -25,7 +25,7 @@ function fetchData() {
 
 function filterData(data) {
     return data.filter(row => {
-        return new Date(row.date) >= new Date('2008-01-01') && new Date(row.date) <= new Date('2017-12-31');
+        return new Date(row.date) >= new Date('2008-01-01') && new Date(row.date) <= new Date('2017-10-28');
 
     });
 }
@@ -37,27 +37,21 @@ function processData() {
     // 初始化 months 对象
     months = {};
     years.forEach(year => {
-        months[year] = Array(12).fill(null).map((_, monthIndex) => {
-            return { dailyTemperature: [] }; // 每个月的数据将动态存储在这个数组中
-        });
+        months[year] = Array(12).fill(null).map(() => ({ dailyTemperature: [] }));
     });
     // 解析温度数据，将每年的每个月数据填充到相应的数组中
     temperatureData.forEach(item => {
         const date = new Date(item.date);
         const year = date.getFullYear();
         const month = date.getMonth(); // 月份是从0到11，所以需要转换
-        const dailyTemperature = isMaxTemp ? item.max_temperature : item.min_tempetature;
-
-        // 2nd if (months[year]) {
-            //1st  months[year][month] = {
-                //max_temperature: item.max_temperature,
-                //min_temperature: item.min_temperature,
-                //daily_temperatures:item.daily_temperatures};
-            // 2nd months[year][month].daily_temperatures.push(dailyTemperature);
-        
+        const dailyTemperature = isMaxTemp ? item.max_temperature : item.min_temperature;
+  
             if (months[year] && months[year][month]) {
                 const day = date.getDate() - 1; // 日期从1开始，但数组是从0开始，所以需要减1
-                months[year][month].dailyTemperature[day] = dailyTemperature;  // 存储每日温度
+                if (!months[year][month].dailyTemperature) {
+                    months[year][month].dailyTemperature = []; // 初始化 dailyTemperature 数组
+                }
+                months[year][month].dailyTemperature[day] = dailyTemperature;
                   
             }
         
@@ -94,11 +88,10 @@ function createMatrix(years, months) {
     monthsNames.forEach((monthData, monthIndex) => {
         years.forEach((year, yearIndex) => {
             const monthInfo = months[year][monthIndex];
-            if (!monthInfo)return;
+            if (!monthInfo || !Array.isArray(monthInfo.dailyTemperature)) return;  // 检查 dailyTemperature 是否是有效数组
+            const temp = isMaxTemp ? Math.max(...monthInfo.dailyTemperature) : (monthInfo.dailyTemperature.length > 0 ? Math.min(...monthInfo.dailyTemperature) : null);
 
-            // 1st const temp = isMaxTemp ? months[year][monthIndex].max_temperature : months[year][monthIndex].min_temperature;
-            const temp = isMaxTemp ? Math.max(...monthInfo.daily_temperatures) : Math.min(...monthInfo.daily_temperatures);
-            const temperatures=months[year][monthIndex].daily_temperatures || [];
+            const temperatures=months[year][monthIndex].dailyTemperature || [];
 
             if (temp !==undefined) {
                 const color = getColorFromTemperature(temp);
@@ -107,17 +100,15 @@ function createMatrix(years, months) {
                 cell.style.backgroundColor = color;
                 cell.setAttribute('data-tooltip', `年份：${year}, 月份：${monthIndex + 1}, 温度：${temp}°C`);
                 matrixContainer.appendChild(cell);
-                //const cellIndex = (monthIndex * years.length) + yearIndex;
 
                 const canvas = document.createElement('canvas');
-                canvas.width = 40;  // 设置canvas宽度
-                canvas.height = 40; // 设置canvas高度
+                canvas.width = 100;  // 设置canvas宽度
+                canvas.height = 50; // 设置canvas高度
                 cell.appendChild(canvas);
 
                 const daysInMonth = new Date(year,monthIndex +1,0).getDate();
-
                 const monthLabels = Array.from({length:daysInMonth},(_,i) => i + 1)
-                const monthData = monthInfo.daily_temperatures.slice(0, daysInMonth);
+                const monthData = monthInfo.dailyTemperature.slice(0, daysInMonth);
                 // 绘制折线图
                 const ctx = canvas.getContext('2d');
                 if (monthData.length > 0) {
@@ -126,11 +117,13 @@ function createMatrix(years, months) {
                         data: {
                             labels: monthLabels,
                             datasets: [{
-                                label: '温度变化',
+                                label:" ",
                                 data: monthData, // 每日温度数据
                                 borderColor: '#4CAF50',
                                 fill: false,
-                                borderWidth: 2
+                                borderWidth: 1,
+                                lineTension: 0.1, // 设置折线的平滑度，值越大越平滑，值越小则起伏越明显
+                                pointRadius: 0, // 设置每个数据点的大小
                             }]
                         },
                         options: {

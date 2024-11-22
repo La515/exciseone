@@ -30,7 +30,7 @@ button:hover {
 /* 外部矩阵容器：用于包裹矩阵、横轴和纵轴 */
 .matrix-container {
     display: grid;
-    grid-template-columns: 50px repeat(10, 50px);
+    grid-template-columns: 100px repeat(10, 100px);
     grid-template-rows: 50px repeat(12, 50px);
     grid-gap: 0px;
     justify-content: center;
@@ -75,14 +75,14 @@ button:hover {
     grid-column: 2 / span 10;
     grid-row: 2 / span 12;
     display: grid;
-    grid-template-columns: repeat(21, 50px);
+    grid-template-columns: repeat(10, 100px);
     grid-template-rows: repeat(12, 50px);
     grid-gap: 0px;
 }
 
 /* 每个温度单元格 */
 .cell {
-    width: 50px;
+    width: 100px;
     height: 50px;
     border: 1px solid #ddd;
     cursor: pointer;
