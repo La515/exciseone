@@ -87,6 +87,13 @@ function createMatrix(years, months) {
     // 生成矩阵中的温度单元格
     monthsNames.forEach((monthData, monthIndex) => {
         years.forEach((year, yearIndex) => {
+            if ((year === 2017) && (monthIndex === 10 || monthIndex === 11)) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                // 设置为空白
+                matrixContainer.appendChild(cell);
+                return; // 跳过后续操作，继续下一个循环
+            }
             const monthInfo = months[year][monthIndex];
             if (!monthInfo || !Array.isArray(monthInfo.dailyTemperature)) return;  // 检查 dailyTemperature 是否是有效数组
             const temp = isMaxTemp ? Math.max(...monthInfo.dailyTemperature) : (monthInfo.dailyTemperature.length > 0 ? Math.min(...monthInfo.dailyTemperature) : null);
@@ -147,10 +154,10 @@ function getColorFromTemperature(temp) {
     else if (temp < 16) {return '#afeeee';}
     else if (temp < 20) {return '#98fb98';}
     else if (temp < 24) {return '#adff2f';}
-    else if (temp < 28) {return 'ffffe0' ;}
-    else if (temp < 32) {return 'ffd700' ;}
-    else if (temp < 36) {return 'ffa500' ;}
-    else if (temp < 40) {return 'ff4500' ;}
+    else if (temp < 28) {return '#fffe0' ;}
+    else if (temp < 32) {return '#ffd700' ;}
+    else if (temp < 36) {return '#ffa500' ;}
+    else if (temp < 40) {return '#ff4500' ;}
 }
 
 function formatDate(year, monthIndex) {
