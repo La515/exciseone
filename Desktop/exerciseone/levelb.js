@@ -57,6 +57,17 @@ function processData() {
         
     });
 
+    // 填充缺失日期的占位符（例如 null）
+    years.forEach(year => {
+        months[year].forEach((monthData, monthIndex) => {
+            const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+            // 确保每个月都有完整的 31 天（或者根据实际的天数），填充缺失的日期
+            while (monthData.dailyTemperature.length < daysInMonth) {
+                monthData.dailyTemperature.push(null); // 用 null 填充缺失的日期
+            }
+        });
+    });
+
     createMatrix(years,months); // 创建矩阵
     createColorLegend(); // 创建颜色图例
 }
@@ -96,8 +107,12 @@ function createMatrix(years, months) {
             }
             const monthInfo = months[year][monthIndex];
             if (!monthInfo || !Array.isArray(monthInfo.dailyTemperature)) return;  // 检查 dailyTemperature 是否是有效数组
-            const temp = isMaxTemp ? Math.max(...monthInfo.dailyTemperature) : (monthInfo.dailyTemperature.length > 0 ? Math.min(...monthInfo.dailyTemperature) : null);
+            // 获取有效的温度数据，过滤掉空数据
+            const validTemperatures = monthInfo.dailyTemperature.filter(temp => temp !== undefined && temp !== null);
+            
+            if (validTemperatures.length === 0) return;  // 如果没有有效数据，则跳过该单元格
 
+            const temp = isMaxTemp ? Math.max(...monthInfo.dailyTemperature) : (monthInfo.dailyTemperature.length > 0 ? Math.min(...monthInfo.dailyTemperature) : null);
             const temperatures=months[year][monthIndex].dailyTemperature || [];
 
             if (temp !==undefined) {
@@ -134,10 +149,15 @@ function createMatrix(years, months) {
                             }]
                         },
                         options: {
-                            responsive: false,
+                            responsive: true,
                             scales: {
                                 x: { ticks: { display: false }, grid: { display: false } },
                                 y: { ticks: { display: false }, grid: { display: false } }
+                            },
+                            plugins:{
+                                legend: {
+                                    display: false,
+                                }
                             }
                         }
                     });
